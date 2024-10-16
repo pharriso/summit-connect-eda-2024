@@ -3,13 +3,15 @@
 Notes for deploying skupper on the demolab vm
 
 Create local storage for DB
+
 ```
 mkdir /home/heroes/data
 ```
+
 Need to change permissions of the folder
-````
-podman unshare chown 26:26 $PWD/data
+
 ```
+podman unshare chown 26:26 $PWD/data
 podman run --name heroes-db -d -p 5432:5432 \
      -v $HOME/data:/var/lib/pgsql/data:Z \
      -e POSTGRESQL_USER=superman \
