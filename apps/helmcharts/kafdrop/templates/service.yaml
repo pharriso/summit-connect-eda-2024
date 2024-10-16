@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: kafdrop
+    app.kubernetes.io/component: kafdrop
+    app.kubernetes.io/instance: kafdrop
+    app.kubernetes.io/name: kafdrop
+    app.openshift.io/runtime-version: latest
+  name: kafdrop
+spec:
+  ports:
+    - name: 9000-tcp
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: kafdrop
+    deployment: kafdrop
+  type: ClusterIP

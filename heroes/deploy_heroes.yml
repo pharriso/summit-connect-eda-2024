@@ -1,0 +1,25 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: clone the heroes git repo
+    ansible.builtin.git:
+      repo: https://github.com/quarkusio/quarkus-super-heroes.git
+      dest: ~/quarkus-super-heroes
+
+  - name: create namespace
+    kubernetes.core.k8s:
+      name: heroes
+      api_version: v1
+      kind: Namespace
+      state: present
+      validate_certs: false
+
+  - name: deploy the app
+    kubernetes.core.k8s:
+      namespace: heroes
+      state: present
+      src: ~/quarkus-super-heroes/deploy/k8s/native-openshift.yml
+      validate_certs: false
+    

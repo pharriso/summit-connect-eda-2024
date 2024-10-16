@@ -1,0 +1,49 @@
+---
+
+- hosts: "{{ ansible_eda.event.body.ci_name | default('all') }}"
+  gather_facts: false
+  pre_tasks:
+  - name: assert that we only have one host in the play
+    ansible.builtin.assert:
+     that:
+        - ansible_play_hosts | length <= 1
+     fail_msg: 'Should only be one host in the play.'
+    run_once: true
+
+  tasks:
+  - name: ensure application service is stopped
+    ansible.builtin.systemd:
+      name: rest-heroes
+      state: stopped
+      scope: user
+    become: true
+    become_user: heroes
+
+  # add appropriate resize for your platform
+  - name: resize memory
+    ansible.builtin.shell: /bin/true
+
+  # add appropriate resize for your platform
+  - name: resize cpu
+    ansible.builtin.shell: /bin/true
+
+  - name: reconfigure app with new memory
+    ansible.builtin.replace:
+      path: /home/heroes/.config/containers/systemd/rest-heroes.container
+      regexp: 'memory=.*'
+      replace: "memory={{ app_mem_size | default('60') }}mb"
+    
+  - name: reload systemd
+    ansible.builtin.systemd:
+      daemon-reload: true
+      scope: user
+    become: true
+    become_user: heroes
+
+  - name: restart application service
+    ansible.builtin.systemd:
+      name: rest-heroes
+      state: started
+      scope: user
+    become: true
+    become_user: heroes

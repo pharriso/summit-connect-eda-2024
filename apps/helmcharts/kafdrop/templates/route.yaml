@@ -1,0 +1,23 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: kafdrop
+  labels:
+    app: kafdrop
+    app.kubernetes.io/component: kafdrop
+    app.kubernetes.io/instance: kafdrop
+    app.kubernetes.io/name: kafdrop
+    app.openshift.io/runtime-version: latest
+  annotations:
+spec:
+  host: kafdrop-eventdrivenapps.apps.conroe.demolab.local
+  to:
+    kind: Service
+    name: kafdrop
+    weight: 100
+  port:
+    targetPort: 9000-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

@@ -1,0 +1,16 @@
+---
+- name: eda raise servicenow tickets
+  hosts: localhost
+  sources:
+    - ansible.eda.kafka:
+        host: eda-streams-kafka-bootstrap.amqstreams.svc.cluster.local
+        port: 9092
+        topic: report-to-snow
+        group_id: eda-sensu
+  rules:
+    - name: raise servicenow incidents
+      condition: event.body.snow.short_description is defined
+      action:
+        run_job_template:
+          name: raise servicenow incident
+          organization: Default

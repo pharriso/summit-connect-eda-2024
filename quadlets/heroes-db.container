@@ -1,0 +1,19 @@
+[Unit]
+Description=The heroes-db container service
+After=local-fs.target
+
+[Container]
+Image=rhel9/postgresql-16
+ContainerName=heroes-db
+PublishPort=5432:5432
+Environment=POSTGRESQL_USER=superman
+Environment=POSTGRESQL_PASSWORD=superman
+Environment=POSTGRESQL_DATABASE=heroes_database
+Volume=$HOME/data:/var/lib/pgsql/data
+
+[Service]
+Restart=always
+
+[Install]
+# Start by default on boot
+WantedBy=default.target

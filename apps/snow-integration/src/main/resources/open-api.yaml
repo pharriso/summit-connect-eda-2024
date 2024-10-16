@@ -1,0 +1,39 @@
+openapi: 3.0.2
+info:
+    title: snow
+    version: 1.0.0
+    description: A brand new API with no content.  Go nuts!
+paths:
+    /snow/ticketresponse:
+        summary: send snow ticket activity
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/snow-response'
+                required: true
+            responses:
+                '200':
+                    description: success
+            operationId: postticketresponse
+components:
+    schemas:
+        snow-response:
+            title: Root Type for snow-response
+            description: ''
+            type: object
+            properties:
+                ec2_vm_name:
+                    type: string
+                snow_request:
+                    type: string
+                ec2_instance_type:
+                    type: string
+                ec2_instance_count:
+                    type: string
+            example:
+                ec2_vm_name: '${ec2_vm_name}'
+                snow_request: '${snow_request}'
+                ec2_instance_type: '${ec2_instance_type}'
+                ec2_instance_count: '${ec2_instance_count}'

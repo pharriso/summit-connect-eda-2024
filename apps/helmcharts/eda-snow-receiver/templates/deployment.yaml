@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: <<unknown>>
+    app.quarkus.io/quarkus-version: 3.14.4
+    app.quarkus.io/commit-id: 85acc117748825c4ab28adeff406fa9dff041637
+    app.quarkus.io/vcs-uri: https://gitlab.consulting.redhat.com/2222/uki-sa/demolab/spikes/eda-for-eda.git
+    app.quarkus.io/build-timestamp: 2024-09-17 - 16:49:15 +0000
+  labels:
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+    app.kubernetes.io/version: 1.0-SNAPSHOT
+    app.kubernetes.io/name: eda-snow-receiver
+  name: eda-snow-receiver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/version: 1.0-SNAPSHOT
+      app.kubernetes.io/name: eda-snow-receiver
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        app.openshift.io/vcs-uri: <<unknown>>
+        app.quarkus.io/quarkus-version: 3.14.4
+        app.quarkus.io/commit-id: 85acc117748825c4ab28adeff406fa9dff041637
+        app.quarkus.io/vcs-uri: https://gitlab.consulting.redhat.com/2222/uki-sa/demolab/spikes/eda-for-eda.git
+        app.quarkus.io/build-timestamp: 2024-09-17 - 16:49:15 +0000
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/version: 1.0-SNAPSHOT
+        app.kubernetes.io/name: eda-snow-receiver
+    spec:
+      containers:
+        - env:
+            - name: JAVA_APP_JAR
+              value: {{ .Values.app.envs.JAVA_APP_JAR | quote }}
+          envFrom:
+            - configMapRef:
+                name: eda-throttler-config
+          image: {{ .Values.app.image }}
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: {{ .Values.app.livenessProbe.failureThreshold }}
+            httpGet:
+              path: {{ .Values.app.livenessProbe.httpGet.path }}
+              port: {{ .Values.app.ports.http }}
+              scheme: {{ .Values.app.livenessProbe.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.app.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.app.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.app.livenessProbe.timeoutSeconds }}
+          name: eda-snow-receiver
+          ports:
+            - containerPort: {{ .Values.app.ports.http }}
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: {{ .Values.app.readinessProbe.failureThreshold }}
+            httpGet:
+              path: {{ .Values.app.readinessProbe.httpGet.path }}
+              port: {{ .Values.app.ports.http }}
+              scheme: {{ .Values.app.readinessProbe.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.app.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.app.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.app.readinessProbe.timeoutSeconds }}
+          startupProbe:
+            failureThreshold: {{ .Values.app.startupProbe.failureThreshold }}
+            httpGet:
+              path: {{ .Values.app.startupProbe.httpGet.path }}
+              port: {{ .Values.app.ports.http }}
+              scheme: {{ .Values.app.startupProbe.httpGet.scheme }}
+            initialDelaySeconds: {{ .Values.app.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.app.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.app.startupProbe.timeoutSeconds }}

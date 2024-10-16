@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "check": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "handlers": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "subscriptions": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "output": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer"
+        },
+        "total_state_change": {
+          "type": "integer"
+        },
+        "last_ok": {
+          "type": "integer"
+        },
+        "occurrences": {
+          "type": "integer"
+        },
+        "occurrences_watermark": {
+          "type": "integer"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "properties": {
+        "entity_class": {
+          "type": "string"
+        },
+        "system": {
+          "type": "object",
+          "properties": {
+            "hostname": {
+              "type": "string"
+            },
+            "os": {
+              "type": "string"
+            },
+            "platform": {
+              "type": "string"
+            },
+            "platform_family": {
+              "type": "string"
+            },
+            "platform_version": {
+              "type": "string"
+            },
+            "arch": {
+              "type": "string"
+            },
+            "libc_type": {
+              "type": "string"
+            }
+          }
+        },
+        "subscriptions": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "last_seen": {
+          "type": "integer"
+        },
+        "user": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "namespace": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string"
+                },
+                "rack": {
+                  "type": "string"
+                }
+              }
+            },
+            "created_by": {
+              "type": "string"
+            }
+          }
+        },
+        "sensu_agent_version": {
+          "type": "string"
+        }
+      }
+    },
+    "id": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string"
+        }
+      }
+    },
+    "timestamp": {
+      "type": "integer"
+    }
+  }
+}

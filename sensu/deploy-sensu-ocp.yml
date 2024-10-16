@@ -1,0 +1,11 @@
+---
+
+- name: deploy sensu into openshift
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: deploy sensu
+    kubernetes.core.k8s:
+      validate_certs: false
+      state: present
+      definition: "{{ lookup('template', 'sensu-deployment.yml.j2')  }}"

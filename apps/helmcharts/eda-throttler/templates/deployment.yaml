@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: <<unknown>>
+    app.quarkus.io/quarkus-version: 3.14.4
+    app.quarkus.io/commit-id: 705bab8300147d1b69747567a7685cac84914154
+    app.quarkus.io/vcs-uri: https://gitlab.consulting.redhat.com/2222/uki-sa/demolab/spikes/eda-for-eda.git
+    app.quarkus.io/build-timestamp: 2024-09-17 - 17:16:42 +0000
+  labels:
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+    app.kubernetes.io/name: eda-throttler
+    app.kubernetes.io/version: 1.0.0
+  name: eda-throttler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: eda-throttler
+      app.kubernetes.io/version: 1.0.0
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+        app.openshift.io/vcs-uri: <<unknown>>
+        app.quarkus.io/quarkus-version: 3.14.4
+        app.quarkus.io/commit-id: 705bab8300147d1b69747567a7685cac84914154
+        app.quarkus.io/vcs-uri: https://gitlab.consulting.redhat.com/2222/uki-sa/demolab/spikes/eda-for-eda.git
+        app.quarkus.io/build-timestamp: 2024-09-17 - 17:16:42 +0000
+      labels:
+        app.kubernetes.io/managed-by: quarkus
+        app.openshift.io/runtime: quarkus
+        app.kubernetes.io/name: eda-throttler
+        app.kubernetes.io/version: 1.0.0
+    spec:
+      containers:
+        - env:
+            - name: JAVA_APP_JAR
+              value: {{ .Values.app.envs.JAVA_APP_JAR | quote }}
+          envFrom:
+            - configMapRef:
+                name: eda-throttler-config
+          image: {{ .Values.app.image }}
+          imagePullPolicy: Always
+          name: eda-throttler
+          ports:
+            - containerPort: {{ .Values.app.ports.http }}
+              name: http
+              protocol: TCP

@@ -1,0 +1,5 @@
+---
+app:
+  image: docker.io/obsidiandynamics/kafdrop:latest
+
+

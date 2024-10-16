@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: kafdrop
+    app.kubernetes.io/component: kafdrop
+    app.kubernetes.io/instance: kafdrop
+    app.kubernetes.io/name: kafdrop
+    app.openshift.io/runtime-version: latest
+  name: kafdrop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: kafdrop
+        deployment: kafdrop
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_BROKERCONNECT
+              value: 'eda-streams-kafka-bootstrap.amqstreams.svc.cluster.local:9092'
+          image: {{ .Values.app.image }}
+          imagePullPolicy: Always
+          name: kafdrop
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP

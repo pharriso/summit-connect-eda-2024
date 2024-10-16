@@ -1,0 +1,91 @@
+- route:
+    id: snow-api-to-kafka
+    from:
+      id: postticketresponse
+      uri: direct:postticketresponse
+      parameters: {}
+      steps:
+        - setHeader:
+            id: GetName
+            description: Get name
+            expression:
+              jsonpath:
+                expression: $.ci_name
+            name: name
+        - to:
+            id: to-2372
+            uri: log:philslogger
+            parameters:
+              multiline: true
+              showAll: true
+              showAllProperties: true
+        - log:
+            id: log-4276
+            message: ${body}
+        - removeHeaders:
+            description: Remove HTTP headers
+            pattern: "*"
+        - setHeader:
+            id: setHeader-1177
+            description: message type
+            expression:
+              constant:
+                expression: snowfix
+                resultType: java.lang.String
+            name: message-type
+        - to:
+            id: to-1230
+            description: Send to Kafka
+            uri: kafka:{{eda.topic}}
+            parameters:
+              brokers: "{{kafka.bootstrap.servers}}"
+- route:
+    id: route-to-snowticket-response
+    description: |
+      Route snow ticket from upper topic to snow ticket reponse topic
+    from:
+      id: From-top-topic
+      description: Receive message from the top topic
+      uri: kafka:{{eda.topic}}
+      parameters:
+        autoOffsetReset: latest
+        brokers: "{{kafka.bootstrap.servers}}"
+        clientId: reroute-snow-response
+      steps:
+        - convertHeaderTo:
+            id: convertHeaderTo-9670
+            name: message-type
+            type: java.lang.String
+        - to:
+            id: to-2583
+            uri: log:beforefilter
+            parameters:
+              showBody: false
+              showBodyType: false
+              showCachedStreams: false
+              showHeaders: true
+              style: Default
+        - filter:
+            id: only receive snow responses
+            description: filter only snow responses
+            steps:
+              - removeHeaders:
+                  id: removeHeaders-3950
+                  description: remove all kafka headers
+                  pattern: "*"
+              - to:
+                  id: to-6199
+                  description: send to snow response topic
+                  uri: kafka:{{snow.topic}}
+                  parameters:
+                    brokers: "{{kafka.bootstrap.servers}}"
+                    clientId: reroute-snow-response
+              - to:
+                  id: to-6345
+                  uri: log:Phil
+                  parameters:
+                    showAll: true
+                    showHeaders: true
+            expression:
+              simple:
+                expression: ${header.message-type} == 'snowfix'

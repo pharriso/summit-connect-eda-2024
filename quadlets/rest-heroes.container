@@ -1,0 +1,26 @@
+[Unit]
+Description=The rest-heroes container service
+Requires=heroes-db.service
+After=heroes-db.service
+
+[Container]
+Image=quay.io/quarkus-super-heroes/rest-heroes:native-latest
+ContainerName=rest-heroes
+PublishPort=8083:8083
+Environment=QUARKUS_DATASOURCE_REACTIVE_URL=postgresql://%H:5432/heroes_database
+Environment=QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION=drop-and-create
+Environment=QUARKUS_DATASOURCE_USERNAME=superman
+Environment=QUARKUS_DATASOURCE_PASSWORD=superman
+Environment=QUARKUS_HIBERNATE_ORM_SQL_LOAD_SCRIPT=import.sql
+Environment=QUARKUS_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
+# Limit memory used by rest-service
+PodmanArgs=--memory=120mb
+
+[Service]
+# delaying start to make sure db service is fully up
+ExecStartPre=/bin/sleep 10
+Restart=always
+
+[Install]
+# Start by default on boot
+WantedBy=default.target

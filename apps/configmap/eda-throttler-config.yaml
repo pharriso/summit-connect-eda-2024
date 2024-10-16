@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eda-throttler-config
+  namespace: eventdrivenapps
+data:
+  windowsecondsthrottle: '90'
+  windowsecondsapperrors: '120'
+  throttlecount: '2'
+  toomanyerrorscount: '3'
+  registryurl: ''
+  schemalocation: 'eda/sensuevent'
+  kafkabootstrapservers: ''
+  eda.topic: sensu-is-good
+  snow.topic: snow-response

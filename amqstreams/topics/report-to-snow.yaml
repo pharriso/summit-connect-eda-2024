@@ -1,0 +1,14 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: report-to-snow
+  labels:
+    strimzi.io/cluster: eda-streams
+  namespace: amqstreams
+spec:
+  config:
+    retention.ms: 3600000ß
+    segment.bytes: 1073741824
+  partitions: 1
+  replicas: 1
+

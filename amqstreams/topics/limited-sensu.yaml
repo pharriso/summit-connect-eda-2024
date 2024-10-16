@@ -1,0 +1,13 @@
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: limited-sensu
+  labels:
+    strimzi.io/cluster: eda-streams
+  namespace: amqstreams
+spec:
+  partitions: 1
+  replicas: 1
+  config:
+    retention.ms: 3600000
+    segment.bytes: 1073741824

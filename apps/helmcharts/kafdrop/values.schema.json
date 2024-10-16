@@ -1,0 +1,60 @@
+{
+  "$schema" : "https://json-schema.org/draft-07/schema#",
+  "properties" : {
+    "app" : {
+      "type" : "object",
+      "properties" : {
+        "image" : {
+          "description" : "The container image to use.",
+          "type" : "string"
+        },
+        "openjdk17" : {
+          "type" : "object",
+          "properties" : {
+            "builderImage" : {
+              "description" : "The base image to be used when a container image is being built.",
+              "type" : "string"
+            }
+          }
+        },
+        "s2iJava" : {
+          "type" : "object",
+          "properties" : {
+            "builderImage" : {
+              "description" : "The base image to be used when a container image is being built.",
+              "type" : "string"
+            }
+          }
+        },
+        "envs" : {
+          "type" : "object",
+          "properties" : {
+            "windowseconds" : {
+              "type" : "string"
+            },
+            "registryurl" : {
+              "type" : "string"
+            },
+            "JAVA_APP_JAR" : {
+              "type" : "string"
+            },
+            "kafkabootstrapservers" : {
+              "type" : "string"
+            }
+          }
+        },
+        "ports" : {
+          "type" : "object",
+          "properties" : {
+            "http" : {
+              "description" : "The port number to use for http.",
+              "type" : "integer"
+            }
+          }
+        }
+      }
+    }
+  },
+  "title" : "Values",
+  "type" : "object"
+}

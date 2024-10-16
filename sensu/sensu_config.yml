@@ -1,0 +1,90 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+  - name: install bonsai assets
+    sensu.sensu_go.bonsai_asset:
+      auth:
+        url: "http://{{ sensu_server }}"
+        user: admin
+        password: "{{ sensu_admin_password }}"
+        verify: false
+      name: "{{ item.name }}"
+      version: "{{ item.version }}"
+    loop: "{{ sensu_bonsai_assets }}"
+    delegate_to: localhost
+    register: sensu_config
+    retries: 3
+    delay: 3
+    until: sensu_config is success
+
+  - name: create event filter
+    sensu.sensu_go.filter:
+      auth:
+        url: "http://{{ sensu_server }}"
+        user: admin
+        password: "{{ sensu_admin_password }}"
+        verify: false
+      name: state_change_only
+      action: allow
+      expressions:
+        - event.check.occurrences == 1
+    delegate_to: localhost
+    register: sensu_config
+    retries: 3
+    delay: 3
+    until: sensu_config is success
+
+  - name: create handlers
+    sensu.sensu_go.pipe_handler:
+      auth:
+        url: "http://{{ sensu_server }}"
+        user: admin
+        password: "{{ sensu_admin_password }}"
+        verify: false
+      name: "{{ item.name }}"
+      command: "{{ item.command }}"
+      runtime_assets: "{{ item.runtime_assets }}"
+      filters: "{{ item.filters | default(omit) }}"
+    loop: "{{ sensu_handlers }}"
+    delegate_to: localhost
+    register: sensu_config
+    retries: 3
+    delay: 3
+    until: sensu_config is success
+
+  - name: create handler set for keepalive
+    sensu.sensu_go.handler_set:
+      auth:
+        url: "http://{{ sensu_server }}"
+        user: admin
+        password: "{{ sensu_admin_password }}"
+        verify: false
+      name: keepalive
+      handlers:
+        - slack
+    delegate_to: localhost
+
+  - name: create checks
+    sensu.sensu_go.check:
+      auth:
+        url: "http://{{ sensu_server }}"
+        user: admin
+        password: "{{ sensu_admin_password }}"
+        verify: false
+      name: "{{ item.name }}"
+      command: "{{ item.command }}"
+      subscriptions: "{{ item.subscriptions }}"
+      interval: "{{ item.interval }}"
+      runtime_assets: "{{ item.runtime_assets }}"
+      publish: "{{ item.publish }}"
+      handlers: "{{ item.handlers | default(omit) }}"
+      proxy_entity_name: "{{ item.proxy_entity_name | default(omit) }}"
+    loop: "{{ sensu_checks }}"
+    delegate_to: localhost
+    register: sensu_config
+    retries: 3
+    delay: 3
+    until: sensu_config is success

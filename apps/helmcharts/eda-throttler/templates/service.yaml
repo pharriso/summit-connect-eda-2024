@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: <<unknown>>
+    app.quarkus.io/quarkus-version: 3.14.4
+    app.quarkus.io/commit-id: 705bab8300147d1b69747567a7685cac84914154
+    app.quarkus.io/vcs-uri: https://gitlab.consulting.redhat.com/2222/uki-sa/demolab/spikes/eda-for-eda.git
+    app.quarkus.io/build-timestamp: 2024-09-17 - 17:16:42 +0000
+  labels:
+    app.kubernetes.io/name: eda-throttler
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: quarkus
+    app.openshift.io/runtime: quarkus
+  name: eda-throttler
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: {{ .Values.app.ports.http }}
+  selector:
+    app.kubernetes.io/name: eda-throttler
+    app.kubernetes.io/version: 1.0.0
+  type: ClusterIP

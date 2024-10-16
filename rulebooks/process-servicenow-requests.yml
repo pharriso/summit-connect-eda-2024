@@ -1,0 +1,22 @@
+---
+- name: eda listen for servicenow requests
+  hosts: localhost
+  sources:
+    - ansible.eda.kafka:
+        host: eda-streams-kafka-bootstrap.amqstreams.svc.cluster.local
+        port: 9092
+        topic: snow-response
+        group_id: eda-sensu
+  rules:
+    - name: resize rhel vm
+      condition: event.body.snow_request is defined and event.body.snow_request_name == 'vm_resize'
+      action:
+        run_job_template:
+          name: resize rhel vm
+          organization: Default
+    - name: decommission rhel vm
+      condition: event.body.snow_request is defined and event.body.snow_request_name == 'vm_decom'
+      action:
+        run_job_template:
+          name: decommission rhel vm
+          organization: Default

@@ -1,0 +1,22 @@
+---
+- name: eda sensu monitoring
+  hosts: localhost
+  sources:
+    - ansible.eda.kafka:
+        host: eda-streams-kafka-bootstrap.amqstreams.svc.cluster.local
+        port: 9092
+        topic: limited-sensu
+        group_id: eda-sensu
+  rules:
+    - name: Check heroes api
+      condition: event.body.check.metadata.name == "check-heroes-api"
+      action:
+        run_job_template:
+          name: fix heroes app
+          organization: Default
+    - name: Check heroes db
+      condition: event.body.check.metadata.name == "check-heroes-db"
+      action:
+        run_job_template:
+          name: fix heroes db
+          organization: Default

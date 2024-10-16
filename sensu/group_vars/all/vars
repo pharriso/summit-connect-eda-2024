@@ -1,0 +1,34 @@
+---
+
+sensu_server: sensu-web-sensu.apps.example.com
+sensu_admin_password: "{{ vault_sensu_admin_password }}"
+sensu_bonsai_assets:
+  - name: sensu/sensu-ruby-runtime
+    version: 0.1.0
+  - name: sensu-plugins/sensu-plugins-http
+    version: 6.0.0
+  - name: sensu/sensu-kafka-handler
+    version: 0.0.4
+  - name: sensu-plugins/sensu-plugins-postgres
+    version: 4.3.0
+sensu_handlers:
+  - name: kafka
+    command: sensu-kafka-handler -H eda-streams-kafka-bootstrap.amqstreams.svc.cluster.local:9092 -t sensu-is-good --insecure-skip-tls-verify
+    runtime_assets:
+      - sensu/sensu-kafka-handler
+    filters:
+      - is_incident
+      - not_silenced
+      - state_change_only
+sensu_checks:
+  - name: check-fights-api
+    command: check-http.rb -u https://rest-fights-superheroes.apps.example.com/q/health -w
+    subscriptions: 
+      - hub
+    interval: 60
+    publish: yes
+    handlers:
+      - kafka
+    runtime_assets:
+      - sensu-plugins/sensu-plugins-http
+      - sensu/sensu-ruby-runtime

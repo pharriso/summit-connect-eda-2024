@@ -1,0 +1,7 @@
+---
+app:
+  envs:
+    JAVA_APP_JAR: /deployments/quarkus-run.jar
+  image: quay.io/edaansible/eda-throttler:v1
+  ports:
+    http: 8080

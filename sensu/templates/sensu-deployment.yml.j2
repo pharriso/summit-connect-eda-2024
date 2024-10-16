@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sensu-admin-user
+  namespace: sensu
+data:
+  SENSU_BACKEND_CLUSTER_ADMIN_USERNAME: admin
+immutable: false
+
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: sensu-admin-password
+  namespace: sensu
+data:
+  SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD: {{ vault_sensu_password }}
+type: Opaque
+
+---
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: sensu-backend
+  namespace: sensu
+  labels:
+    app: sensu-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensu-backend
+  template:
+    metadata:
+      name: sensu-backend
+      labels:
+        app: sensu-backend
+      annotations:
+        openshift.io/required-scc: "anyuid"
+    spec:
+      containers:
+        - name: sensu-backend
+          image: 'docker.io/sensu/sensu:latest'
+          command:
+            - sensu-backend
+            - start
+            - '--log-level'
+            - debug
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 3000
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: sensu-vol
+              mountPath: /var/lib/sensu/backend
+          env:
+            - name: SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sensu-admin-password
+                  key: SENSU_BACKEND_CLUSTER_ADMIN_PASSWORD
+            - name: SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: sensu-admin-user
+                  key: SENSU_BACKEND_CLUSTER_ADMIN_USERNAME
+      volumes:
+        - name: sensu-vol
+          persistentVolumeClaim:
+            claimName: sensu-vol
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sensu-vol
+  namespace: sensu
+  labels:
+    app: sensu-backend 
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sensu-backend
+  namespace: sensu
+  labels:
+    app: sensu-backend 
+spec:
+  selector:
+    app: sensu-backend
+  ports:
+    - name: api
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: ws
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+    - name: webui
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sensu-web
+  namespace: sensu
+  labels:
+    app: sensu-backend 
+spec:
+  to:
+    kind: Service
+    name: sensu-backend
+  port:
+    targetPort: webui
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sensu-api
+  namespace: sensu
+  labels:
+    app: sensu-backend 
+spec:
+  to:
+    kind: Service
+    name: sensu-backend
+  port:
+    targetPort: api
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sensu-ws
+  namespace: sensu
+  labels:
+    app: sensu-backend
+spec:
+  to:
+    kind: Service
+    name: sensu-backend
+  port:
+    targetPort: ws
