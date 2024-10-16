@@ -59,9 +59,9 @@ delete heroes from openshift
 oc delete all -l application=heroes-service -n heroes
 ```
 
-```
 create skupper rest-heroes service
 
+```
 skupper service create rest-heroes 8083
 ```
 
